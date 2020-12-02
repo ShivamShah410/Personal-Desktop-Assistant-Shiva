@@ -1,0 +1,100 @@
+import pyttsx3
+import datetime
+import speech_recognition as sr
+import wikipedia
+import webbrowser
+import os
+
+# initialising text-to-speech engine
+engine = pyttsx3.init("sapi5")
+voices = engine.getProperty("voices")
+# print(voices[1].id)
+engine.setProperty("voice", voices[0].id)
+
+# defining speak function
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+# defining starting greeting function
+def wishMe():
+    h = int(datetime.datetime.now().hour)
+    # print(hour)
+    if(h>=6 and h<12):
+        speak("Good Morning")
+    elif(h>=12 and h<18):
+        speak("Good Afternoon")
+    elif(h>=18 and h<22):
+        speak("Good Evening")
+    else:
+        speak("Good Night")
+    
+    speak("I am Shiva robot. How can I help you?")
+
+# function to give command using voice
+def takeCommand():
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        r.pause_threshold = 1
+        audio = r.listen(source)
+    try:
+        print("Recognizing...")
+        query = r.recognize_google(audio, language = 'en-in')
+        print(f"User Said : {query}\n")
+        # speak(query)
+    except Exception as e:
+        # print(e)
+        print("Sorry, Say that again please...")
+        return"None"
+    return query
+
+# main method
+if __name__ == "__main__":
+    # speak("Shiva is a good boy")
+
+    wishMe()
+    q = takeCommand().lower()
+
+    # logic for wikipeda search
+    if "wikipedia" in q:
+        speak("Searching Wikipedia...")
+        result = wikipedia.summary(q, sentences=2)
+        print(result)
+        speak(result)
+    
+    # logic to open various websites
+    elif "open youtube" in q:
+        webbrowser.open("youtube.com")
+    
+    elif "open google" in q:
+        webbrowser.open("google.com")
+    
+    # logic to show current time
+    elif "the time" in q:
+        strTime = datetime.datetime.now().strftime("%H:%M:%S")
+        print(f"the time is {strTime}")
+        speak(f"The time is{strTime}")
+
+    # logic to play song
+    elif "play music" in q:
+        music_dir = "C:\\Users\\SHIVAM SHAH\\Best Files & Folder\\Besr Gujarati Songs"
+        songs = os.listdir(music_dir)
+        # print(songs)
+        os.startfile(os.path.join(music_dir, songs[1]))
+    
+    # logic to open various installed apps
+    appsPath = {
+        "code" : "C:\\Users\\SHIVAM SHAH\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
+        "chrome" : "C:\\Users\\SHIVAM SHAH\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe",
+        "inkscape" : "C:\\Program Files\\Inkscape\\bin\\inkscape.exe",
+        "telegram" : "C:\\Users\\SHIVAM SHAH\\AppData\\Roaming\\Telegram Desktop\\Telegram.exe"
+    }
+    key = list(appsPath.keys())
+
+    for i in key:
+        if "open "+i in q:
+            os.startfile(appsPath[i])
+
+    
+    
